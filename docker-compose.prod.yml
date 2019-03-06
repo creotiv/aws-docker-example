@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  nginx:
+    image: awsdemo-nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/mediafiles
+    depends_on:
+      - web
+    networks:
+      - backend_net
+
+  web:
+    image: awsdemo-app:latest
+    command: gunicorn awsdemo.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./app/:/usr/src/app/
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/mediafiles
+    environment:
+      - SQL_ENGINE=postgresql
+      - SQL_DATABASE=awsdemo
+      - SQL_USER=awsdemo
+      - SQL_PASS=awsdemo
+      - SQL_HOST=db
+      - SQL_PORT=5432
+    depends_on:
+      - db
+    networks:
+      - backend_net
+
+  db:
+    image: postgres:11.2-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - backups:/var/lib/postgresql/backups/
+    environment:
+      - POSTGRES_DB=awsdemo
+      - POSTGRES_USER=awsdemo
+      - POSTGRES_PASSWORD=awsdemo
+    networks:
+      - backend_net
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  backups:
+
+networks:
+  backend_net:
