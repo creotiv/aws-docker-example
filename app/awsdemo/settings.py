@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'awsdemo.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 
-if os.getenv('SQL_DATABASE') == 'postgresql':
+if os.getenv('SQL_ENGINE') == 'postgresql':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',

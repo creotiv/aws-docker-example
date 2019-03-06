@@ -3,7 +3,6 @@ from fabric2.transfer import Transfer
 import time
 import getpass
 
-
 HOST = 'ec2-13-53-129-145.eu-north-1.compute.amazonaws.com'
 KEY_FILE = '../aws-sk.pem'
 DEFAULT_LOGIN = 'demo@demo.com'
@@ -46,22 +45,22 @@ def install_instance(c):
             while True:
                 res = host.run('docker service ls | grep awsdemo_web.*0/')
                 if not res.stdout.strip():
+                    time.sleep(4)
                     break    
                 time.sleep(2)
-            host.run('''docker exec $(docker ps -q -f name=awsdemo_web) /usr/src/app/manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser(username="%s", email='%s', password='%s')"''' % (DEFAULT_USER, DEFAULT_LOGIN, DEFAULT_PASS))
-
+            host.run('''docker exec $(docker ps -q -f name=awsdemo_web) /usr/src/app/manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser(username='%s', email='%s', password='%s')"''' % (DEFAULT_USER, DEFAULT_LOGIN, DEFAULT_PASS))
     else:
         print('Docker already installed.')
         
 @task
 def set_pass(c):
-    host.run('''docker exec $(docker ps -q -f name=awsdemo_web) /usr/src/app/manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser(username="%s", email='%s', password='%s')"''' % (DEFAULT_USER, DEFAULT_LOGIN, DEFAULT_PASS))
+    host.run('''docker exec $(docker ps -q -f name=awsdemo_web) /usr/src/app/manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser(username='%s', email='%s', password='%s')"''' % (DEFAULT_USER, DEFAULT_LOGIN, DEFAULT_PASS))
 
 @task
 def deploy(c):
     with host.cd('awsdemo'):
         host.run('git pull')
-        host.run('git checkout AWS')
+        host.run('git checkout master')
         host.run('docker build -t awsdemo-app app')
         host.run('docker build -t awsdemo-nginx nginx')
         host.run('docker service update awsdemo_web')
