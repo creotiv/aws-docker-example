@@ -1,6 +1,7 @@
-# AWS free tire + Docker Demo
+# AWS free tier + Docker Demo
+https://aws.amazon.com/free/
 
-Please read article before use this: 
+Please read article before use this: https://hackernoon.com/deploying-on-aws-free-tire-with-docker-and-fabric-d9eca7c629e6
 
 ## Fabric commands
 
